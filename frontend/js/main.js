@@ -48,7 +48,7 @@ $(document).ready(function() {
     // Add to cart
     $('#coffee-menu').on('click', 'button', function() {
       let id = $(this).data('id');
-      $.post(/cart/${id}, function(response) {
+      $.post(`/cart/${id}`, function(response) {
         alert(response);
       });
     });

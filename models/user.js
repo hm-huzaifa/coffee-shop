@@ -7,12 +7,5 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
 
-userSchema.pre('save', function(next) {
-  if (this.isModified('password')) {
-    this.password = bcrypt.hashSync(this.password, 8);
-  }
-  next();
-});
-
 const User = mongoose.model('User', userSchema);
 module.exports = User;

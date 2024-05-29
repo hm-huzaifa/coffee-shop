@@ -1,33 +1,34 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const CoffeeItem = require('../models/coffeeItem');
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 
 const router = express.Router();
 
-// Middleware to authenticate token
-const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization');
-  if (!token) return res.status(401).send('Access Denied');
-  try {
-    const verified = jwt.verify(token, 'secretKey');
-    req.user = verified;
-    next();
-  } catch (err) {
-    res.status(400).send('Invalid Token');
-  }
-};
+// Register a new user
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const existingUser = await User.findOne({ username });
+  if (existingUser) return res.status(400).json({ message: 'Username already exists' });
 
-// Get items in cart
-router.get('/', authenticateToken, (req, res) => {
-  // This is a placeholder; you'll need to implement cart functionality
-  res.status(200).send('Get cart items');
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ username, password: hashedPassword, role: 'user' });
+  await user.save();
+  res.status(201).json({ message: 'User registered' });
 });
 
-// Add item to cart
-router.post('/:id', authenticateToken, async (req, res) => {
-  const coffeeItem = await CoffeeItem.findById(req.params.id);
-  // This is a placeholder; you'll need to implement cart functionality
-  res.status(201).send(`Added ${coffeeItem.name} to cart`);
+// Login a user
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username });
+  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) return res.status(400).json({ message: 'Invalid credentials' });
+
+  const token = jwt.sign({ _id: user._id, username: user.username, role: user.role }, 'secretKey');
+  
+  res.header('Authorization', token).json({ token });
 });
 
 module.exports = router;

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Coffee Items</title>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Coffee Items</h2>
+        <div id="coffeeList" class="row"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="js/coffee.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/coffee',
+                type: 'GET',
+                success: function(data) {
+                    data.forEach(item => {
+                        $('#coffeeList').append(`
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <img src="${item.image}" class="card-img-top" alt="${item.name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.name}</h5>
+                                        <p class="card-text">${item.description}</p>
+                                        <p class="card-text">$${item.price}</p>
+                                        <button class="btn btn-primary addToCart" data-id="${item._id}">Add to Cart</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    $('.addToCart').on('click', function() {
+                        const id = $(this).data('id');
+                        const token = localStorage.getItem('token');
+                        $.ajax({
+                            url: `/cart/${id}`,
+                            type: 'POST',
+                            headers: { 'Authorization': token },
+                            success: function(response) {
+                                alert(response.message);
+                            },
+                            error: function(response) {
+                                alert(response.responseJSON.message);
+                            }
+                        });
+                    });
+                },
+                error: function(response) {
+                    alert(response.responseJSON.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
