@@ -10,7 +10,7 @@ $('#loginForm').on('submit', function(e) {
         }),
         success: function(response) {
             localStorage.setItem('token', response.token);
-            window.location.href = 'coffee.html';
+            window.location.href = 'index.html';
         },
         error: function(response) {
             alert(response.responseText);

@@ -5,9 +5,9 @@ $(document).ready(function() {
         success: function(data) {
             data.forEach(item => {
                 $('#coffeeList').append(`
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <img src="${item.image}" class="card-img-top" alt="${item.name}">
+                    <div class="col-md-4 my-3">
+                        <div class="card" style="width: 18rem;">
+                            <img src="${item.image}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="${item.name}">
                             <div class="card-body">
                                 <h5 class="card-title">${item.name}</h5>
                                 <p class="card-text">${item.description}</p>
